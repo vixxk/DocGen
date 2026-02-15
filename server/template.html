@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{docType}}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&family=Playfair+Display:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #1a2b27;
+            --text-color: #333;
+            --white: #ffffff;
+            --gray-light: #f6f6f6;
+            --border-color: #e0e0e0;
+        }
+
+        @page {
+            size: A4;
+            margin: 0;
+            margin-top: 40px;
+        }
+
+        @page :first {
+            margin-top: 0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            background: #fff;
+        }
+
+        .page-container {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            position: relative;
+            overflow: hidden; /* Prevent sub-pixel horizontal scrolling */
+        }
+
+        header {
+            background-color: var(--primary-bg);
+            color: var(--white);
+            padding: 50px 0 70px 0;
+            position: relative;
+            overflow: hidden;
+            width: 100.1%; /* Slightly over 100% to cover sub-pixel gaps */
+            margin-left: -0.05%; 
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding: 0 40px;
+            position: relative;
+            z-index: 2;
+            gap: 20px;
+        }
+
+        .header-left {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .doc-type {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .company-details {
+            font-size: 12px;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .header-right {
+            flex-shrink: 0;
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .company-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 42px;
+            margin: 0;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            line-height: 1;
+        }
+
+        .company-subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 5px;
+            opacity: 0.9;
+            white-space: nowrap;
+        }
+
+        .header-circle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .hc-1 { width: 300px; height: 300px; top: -150px; right: -50px; }
+
+        .header-indicator {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 20px solid var(--primary-bg);
+            z-index: 10;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding-bottom: 220px; 
+        }
+
+        .recipient-section {
+            padding: 60px 40px 30px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .to-label { font-family: 'Outfit', sans-serif; font-weight: 700; margin-bottom: 5px; }
+        .to-name { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 20px; line-height: 1.4; white-space: pre-line; }
+        .to-address { font-size: 14px; margin-top: 4px; opacity: 0.9; }
+        .date-text { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 18px; }
+
+        .table-section {
+            padding: 0 40px;
+            flex-grow: 1; 
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        thead { display: table-header-group; }
+        
+        thead th {
+            background-color: var(--primary-bg);
+            color: var(--white);
+            text-align: left;
+            padding: 15px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        thead th:not(:first-child) { text-align: center; }
+
+        tbody td {
+            padding: 15px;
+            font-size: 14px;
+            border-bottom: 1px solid var(--border-color);
+            word-break: break-all;
+        }
+
+        tbody tr:nth-child(even) { background-color: var(--gray-light); }
+
+        .col-desc { width: 50%; }
+        .col-qty { width: 15%; }
+        .col-price { width: 17%; }
+        .col-amount { width: 18%; }
+
+        /* Summary Section */
+        .summary-section {
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+            page-break-inside: avoid;
+        }
+
+        .summary-row { display: flex; gap: 15px; font-size: 16px; font-family: 'Outfit', sans-serif; font-weight: 700; }
+        .summary-label { min-width: 150px; text-align: right; }
+        .summary-value { min-width: 100px; text-align: right; }
+        .total-row { font-size: 20px; border-top: 1px solid #000; padding-top: 8px; margin-top: 5px; }
+        .final-total-row { font-size: 24px; color: var(--primary-bg); border-top: 2px solid var(--primary-bg); padding-top: 10px; margin-top: 5px; }
+
+        footer {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            right: 0;
+            padding: 0 40px 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            page-break-inside: avoid;
+            background: #fff;
+        }
+
+        .terms-area {
+            font-size: 11px;
+            line-height: 1.8;
+            max-width: 60%;
+        }
+
+        .terms-header {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .sig-area { text-align: center; }
+        .sig-img { width: 150px; height: auto; margin-bottom: 5px; }
+        .sig-text { font-family: 'Outfit', sans-serif; font-size: 13px; font-weight: 700; }
+        .sig-text span { font-weight: 400; opacity: 0.7; }
+
+        tr { page-break-inside: avoid; page-break-after: auto; }
+        
+        @media print {
+            thead tr th {
+                padding-top: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <header>
+            <div class="header-circle hc-1"></div>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="doc-type">{{docType}}</h1>
+                    <div class="company-details">
+                        Arpana Bank Colony, Gola Road<br>
+                        Patna- 801503<br>
+                        ravishankar.tiwary3@gmail.com<br>
+                        GSTIN: 10AYCPK2119G1Z5
+                    </div>
+                </div>
+                <div class="header-right">
+                    <h2 class="company-name">ROYAL SURGICALS</h2>
+                    <div class="company-subtitle">House of Medical Equipments</div>
+                </div>
+            </div>
+            <div class="header-indicator"></div>
+        </header>
+
+        <main class="content-area">
+            <section class="recipient-section">
+                <div class="to-box">
+                    <div class="to-label">To:</div>
+                    <div class="to-name">{{to}}</div>
+                    {{#if toAddress}}<div class="to-address">{{toAddress}}</div>{{/if}}
+                </div>
+                <div class="date-box">
+                    <span class="date-text">Date: {{date}}</span>
+                </div>
+            </section>
+
+            <section class="table-section">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="col-desc">Item Description</th>
+                            {{#if showQty}}<th class="col-qty">Qty</th>{{/if}}
+                            {{#if showPrice}}<th class="col-price">Unit Price</th>{{/if}}
+                            {{#if showAmount}}<th class="col-amount">Amount</th>{{/if}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{#each items}}
+                        <tr>
+                            <td>{{description}}</td>
+                            {{#if ../showQty}}<td style="text-align: center;">{{qty}}</td>{{/if}}
+                            {{#if ../showPrice}}<td style="text-align: center;">{{price}}/-</td>{{/if}}
+                            {{#if ../showAmount}}<td style="text-align: center;">{{amount}}/-</td>{{/if}}
+                        </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="summary-section">
+                {{#if subtotal}}
+                <div class="summary-row">
+                    <span class="summary-label">Subtotal:</span>
+                    <span class="summary-value">{{subtotal}}/-</span>
+                </div>
+                {{/if}}
+
+                {{#if gst}}
+                <div class="summary-row">
+                    <span class="summary-label">GST{{#if gstPercent}}({{gstPercent}}%){{/if}}:</span>
+                    <span class="summary-value">{{gst}}/-</span>
+                </div>
+                {{/if}}
+                
+                {{#if finalAmount}}
+                <div class="summary-row final-total-row">
+                    <span class="summary-label">Final Total:</span>
+                    <span class="summary-value">{{finalAmount}}/-</span>
+                </div>
+                {{/if}}
+
+                {{#if advancePayment}}
+                <div class="summary-row">
+                    <span class="summary-label">Advance:</span>
+                    <span class="summary-value">{{advancePayment}}/-</span>
+                </div>
+                {{/if}}
+
+                {{#if paymentDone}}
+                <div class="summary-row">
+                    <span class="summary-label">Payment Done:</span>
+                    <span class="summary-value">{{paymentDone}}/-</span>
+                </div>
+                {{/if}}
+
+                {{#if paymentRemaining}}
+                <div class="summary-row total-row">
+                    <span class="summary-label">Remaining:</span>
+                    <span class="summary-value">{{paymentRemaining}}/-</span>
+                </div>
+                {{/if}}
+            </section>
+        </main>
+
+        <footer>
+            <div class="terms-area">
+                <div class="terms-header">Terms and Conditions:</div>
+                {{#if terms}}
+                    {{#each terms}}
+                        {{this}}<br>
+                    {{/each}}
+                {{else}}
+                    Payment 100% advance against invoice<br>
+                    Delivery charges and GST extra as applicable<br>
+                    Warranty one year from date of delivery
+                {{/if}}
+            </div>
+            <div class="sig-area">
+                <img src="{{signatureUrl}}" alt="Signature" class="sig-img">
+                <div class="sig-text"><span>for</span> ROYAL SURGICALS</div>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
